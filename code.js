@@ -5,7 +5,8 @@ let index = 0;
 
 const readHeader = (imageData) => {
   while (
-    imageData[index] === 0x20 || imageData[index] === 0x0A ||
+    imageData[index] === 0x20 ||
+    imageData[index] === 0x0A ||
     imageData[index] === 0x0D ||
     imageData[index] === 0x09
   ) {
@@ -44,6 +45,24 @@ const generateImageStr = (x, width, pixels) => {
   return line;
 };
 
+const generatePixels = (height, width, imageData) => {
+  const pixelCount = width * height;
+  const pixels = new Uint8Array(pixelCount * 3);
+
+  for (let p = 0; p < pixelCount * 3; p++) {
+    pixels[p] = imageData[++index];
+  }
+
+  return pixels;
+};
+
+const displayImage = (height, width, pixels) => {
+  for (let x = 0; x < height; x++) {
+    const imageStr = generateImageStr(x, width, pixels);
+    console.log(imageStr);
+  }
+};
+
 const main = async () => {
   const imageData = await readFile();
   const token = readHeader(imageData);
@@ -52,17 +71,8 @@ const main = async () => {
   const height = Number(readHeader(imageData));
   const maxValue = Number(readHeader(imageData));
 
-  const pixelCount = width * height;
-  const pixels = new Uint8Array(pixelCount * 3);
-
-  for (let p = 0; p < pixelCount * 3; p++) {
-    pixels[p] = imageData[++index];
-  }
-
-  for (let x = 0; x < height; x++) {
-    const imageStr = generateImageStr(x, width, pixels);
-    console.log(imageStr);
-  }
+  const pixels = generatePixels(height, width, imageData);
+  displayImage(height, width, pixels);
 };
 
 main();
