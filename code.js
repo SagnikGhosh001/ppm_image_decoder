@@ -1,28 +1,26 @@
 const readFile = async () => await Deno.readFile("./imageset1/stop01.ppm");
 import { bgRgb24 } from "jsr:@std/fmt/colors";
 
-let index = 0;
-
-const readHeader = (imageData) => {
+const readHeader = (imageData, index) => {
   while (
-    imageData[index] === 0x20 ||
-    imageData[index] === 0x0A ||
-    imageData[index] === 0x0D ||
-    imageData[index] === 0x09
+    imageData[index[0]] === 0x20 ||
+    imageData[index[0]] === 0x0A ||
+    imageData[index[0]] === 0x0D ||
+    imageData[index[0]] === 0x09
   ) {
-    index++;
+    index[0]++;
   }
 
-  if (imageData[index] === 0x23) {
-    while (imageData[index] !== 0x0A) index++;
-    return readHeader(imageData);
+  if (imageData[index[0]] === 0x23) {
+    while (imageData[index[0]] !== 0x0A) index[0]++;
+    return readHeader(imageData, index);
   }
 
   let token = "";
 
-  while (imageData[index] > 0x20) {
-    token += String.fromCharCode(imageData[index]);
-    index++;
+  while (imageData[index[0]] > 0x20) {
+    token += String.fromCharCode(imageData[index[0]]);
+    index[0]++;
   }
 
   return token;
@@ -45,12 +43,12 @@ const generateImageStr = (x, width, pixels) => {
   return line;
 };
 
-const generatePixels = (height, width, imageData) => {
+const generatePixels = (height, width, imageData, index) => {
   const pixelCount = width * height;
   const pixels = new Uint8Array(pixelCount * 3);
 
   for (let p = 0; p < pixelCount * 3; p++) {
-    pixels[p] = imageData[++index];
+    pixels[p] = imageData[++index[0]];
   }
 
   return pixels;
@@ -65,13 +63,16 @@ const displayImage = (height, width, pixels) => {
 
 const main = async () => {
   const imageData = await readFile();
-  const token = readHeader(imageData);
-  if (token !== "P6") throw new Error("P6 allowed");
-  const width = Number(readHeader(imageData));
-  const height = Number(readHeader(imageData));
-  const maxValue = Number(readHeader(imageData));
+  const index = [0];
 
-  const pixels = generatePixels(height, width, imageData);
+  const token = readHeader(imageData, index);
+  if (token !== "P6") throw new Error("P6 allowed");
+
+  const width = Number(readHeader(imageData, index));
+  const height = Number(readHeader(imageData, index));
+  const maxValue = Number(readHeader(imageData, index));
+
+  const pixels = generatePixels(height, width, imageData, index);
   displayImage(height, width, pixels);
 };
 
