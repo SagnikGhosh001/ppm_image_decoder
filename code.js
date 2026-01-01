@@ -1,4 +1,4 @@
-const readFile = async () => await Deno.readFile("./imageset1/stop03.ppm");
+const readFile = async () => await Deno.readFile("./imageset1/stop01.ppm");
 import { bgRgb24 } from "jsr:@std/fmt/colors";
 
 let index = 0;
@@ -41,7 +41,7 @@ const generateImageStr = (x, width, pixels) => {
     line += bgRgb24(" ", { r, g, b });
   }
 
-  console.log(line);
+  return line;
 };
 
 const main = async () => {
@@ -56,7 +56,7 @@ const main = async () => {
   const pixels = new Uint8Array(pixelCount * 3);
 
   for (let p = 0; p < pixelCount * 3; p++) {
-    pixels[p] = imageData[index++];
+    pixels[p] = imageData[++index];
   }
 
   for (let x = 0; x < height; x++) {
