@@ -1,5 +1,5 @@
-const readFile = async () => await Deno.readFile("./imageset1/stop01.ppm");
 import { bgRgb24 } from "jsr:@std/fmt/colors";
+const readFile = async () => await Deno.readFile("./imageset1/znonstop01.ppm");
 
 const readHeader = (imageData, index) => {
   while (
